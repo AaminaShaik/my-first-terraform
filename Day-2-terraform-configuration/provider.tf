@@ -1,0 +1,9 @@
+
+provider "aws" {
+  # Configuration options
+}
+
+
+
+
+
