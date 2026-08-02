@@ -57,7 +57,11 @@ pipeline{
         }
         stage('manager approval'){
             steps{
-                input 'Do you want to proceed with Terraform Apply?',ok:'Yes, I want to proceed'
+                input (
+                    message:'Do you want to proceed with Terraform Apply?',
+                    ok:'Yes, I want to proceed'
+                )
+                
             }
         }
        
