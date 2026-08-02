@@ -1,0 +1,79 @@
+pipeline{
+    agent any
+     options {
+        disableConcurrentBuilds()
+    }
+// this option will prevent multiple builds of the same pipeline from running concurrently. if a build is already running, any new build requests will be queued until the current build is finished.
+    
+    environment {
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+//     environment {
+//     TF_DIR = "Day-weekend-task-2/jenkins-pipeline-scm"
+// } 
+// we can also use this environment variable to set the working directory for terraform commands instead of using dir command in each stage.
+
+    stages{
+        stage('git checkout'){
+            steps{
+                git branch: 'main', url: 'https://github.com/AaminaShaik/my-first-terraform.git'
+            }
+        } 
+        stage('Terraform Init'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm') {
+                    //    dir(env.TF_DIR) 
+                     sh 'terraform init'
+                }
+            }
+        }
+         stage('Terraform Validate'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm'){
+                    sh 'terraform validate'
+                }
+            }
+        }
+        stage('Terraform Format'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm'){
+                    sh 'terraform fmt'
+                }
+            }
+        }
+        stage('terraform fmt check'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm'){
+                    sh 'terraform fmt -check'
+                }
+            }
+        }
+        stage('Terraform Plan'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm'){
+                    sh 'terraform plan'
+                }
+            }
+        }
+        stage('manager approval'){
+            steps{
+                input 'Do you want to proceed with Terraform Apply?',ok:'Yes, I want to proceed'
+            }
+        }
+       
+        stage('Terraform Apply'){
+            steps{
+                dir('Day-weekend-task-2/jenkins-pipeline-scm'){
+                    sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+    }
+}
+
+// i have created a jenkins pipeline to automate the terraform commands. it will first checkout the code from git and then run the terraform commands in sequence. it will also ask for manager approval before applying the changes.
+// i have created separate stages for each terraform command to make it easier to debug in case of any errors.
+// i have also used the dir command to change the working directory to the terraform code directory before running the terraform commands.
+// i have also used the input command to ask for manager approval before applying the changes. this will help to prevent any accidental changes to the infrastructure.
+// i have also used the -auto-approve flag with the terraform apply command to skip the interactive approval prompt. this will help to automate the process and make it faster.
+// i have creaed seperate ec2 insance in console ,inside tha ec2 i have insalled git,java,jenkins,terraform and from that instance i have accessed the jenkins dashbord and there i have runned the pipeline which  have ceated the ec2 instance in aws using terraform code which is present in git repository.(my-first-terraform/Day-weekend-task-2/jenkins-pipeline-scm(main.tf have the code to create ec2 instance in aws using terraform))
